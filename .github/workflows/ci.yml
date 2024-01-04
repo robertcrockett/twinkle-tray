@@ -16,6 +16,8 @@ jobs:
       - name: package.json info
         id: info
         uses: jaywcjlove/github-action-package@main
+        with:
+          version: "${{ steps.info.outputs.version }}+${{ github.sha }}"
       - run: npm ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

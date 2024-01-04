@@ -16,15 +16,13 @@ jobs:
       - name: package.json info
         id: info
         uses: jaywcjlove/github-action-package@main
-        with:
-          version: "${{ steps.info.outputs.version }}+${{ github.sha }}"
       - run: npm ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: npm run parcel-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run electron-build
+      - run: npx electron-builder --x64 -c.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" -c.win.artifactName="${productName} v${{ steps.info.outputs.version }}.${ext}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v3

@@ -22,7 +22,7 @@ jobs:
       - run: npm run parcel-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npx electron-builder --x64 -c.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" -c.win.artifactName="${productName} v${{ steps.info.outputs.version }}.${ext}"
+      - run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.buildVersion="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="${productName} v${{ steps.info.outputs.version }}.${ext}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v3

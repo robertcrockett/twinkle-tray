@@ -60,7 +60,7 @@ jobs:
           path: dist/*.exe
           
       - name: Build x64 AppX
-        run: npm exec electron-builder -- --x64 --win appx --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}-store.appx"
+        run: npm exec electron-builder -- --x64 --win appx --config.npmRebuild=false --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}-store.appx"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           

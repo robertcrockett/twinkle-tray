@@ -23,7 +23,7 @@ jobs:
       - run: npm run parcel-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.buildVersion="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}.exe"
+      - run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}.exe"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4

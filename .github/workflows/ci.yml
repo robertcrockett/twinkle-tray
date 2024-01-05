@@ -2,6 +2,9 @@ name: CI Build
 
 on: [push, pull_request]
 
+env:
+ BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+
 jobs:
   build:
     name: Build all
@@ -61,23 +64,27 @@ jobs:
           path: dist/*.exe
           
       - name: Build x64 AppX
+        if: ${{ env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'ci-test' }}
         run: npm exec electron-builder -- --x64 --win appx --config.npmRebuild=false --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}-store.appx"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
       - uses: actions/upload-artifact@v4
         name: Upload x64 AppX
+        if: ${{ env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'ci-test' }}
         with:
           name: twinkle-tray-appx-x64-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*-store.appx
           
       - name: Build ARM64 AppX
+        if: ${{ env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'ci-test' }}
         run: npm exec electron-builder -- --arm64 --win appx --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}-store-arm64.appx"
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             
       - uses: actions/upload-artifact@v4
         name: Upload ARM64 AppX
+        if: ${{ env.BRANCH_NAME == 'master' || env.BRANCH_NAME == 'ci-test' }}
         with:
           name: twinkle-tray-appx-arm64-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*-store-arm64.appx

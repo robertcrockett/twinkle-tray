@@ -27,10 +27,11 @@ jobs:
         with:
           path: ./node_modules
           key: node_modules-${{ hashFiles('package-lock.json') }}
+          enableCrossOsArchive: true
           
       - name: Prepare dependencies for cache
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npm ci --ignore-scripts
+        run: npm ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,12 +41,7 @@ jobs:
         with:
           path: ./node_modules
           key: ${{ steps.load-cache-node_modules.outputs.cache-primary-key }}
-          
-      - name: Install dependencies
-        if: steps.load-cache-node_modules.outputs.cache-hit != 'true'
-        run: npm i
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          enableCrossOsArchive: true
           
       - name: Build assets
         run: npm run parcel-build

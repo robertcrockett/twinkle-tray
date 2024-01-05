@@ -42,7 +42,7 @@ jobs:
           key: ${{ steps.load-cache-node_modules.outputs.cache-primary-key }}
           
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.load-cache-node_modules.outputs.cache-hit != 'true'
         run: npm i
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

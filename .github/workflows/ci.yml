@@ -3,52 +3,38 @@ name: CI Build
 on: [push, pull_request]
 
 jobs:
-  win32:
-    name: "Build Win32 Installer"
+  build:
+    name: Build All
     runs-on: windows-2022
 
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js 18
+      - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
-      - name: package.json info
+      - name: Get package.json info
         id: info
         uses: jaywcjlove/github-action-package@main
       - run: npm ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run parcel-build
+      - name: Build assets
+        run: npm run parcel-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}.exe"
+      - name: Build Win32 installer
+        run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}.exe"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
-        name: Upload Windows Installer
+        name: Upload Win32 installer
         with:
           name: twinkle-tray-exe-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*.exe
-  appx:
-    name: "Build AppX Packages"
-    runs-on: windows-2022
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js 18
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-      - name: package.json info
-        id: info
-        uses: jaywcjlove/github-action-package@main
-      - run: npm ci
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run appx
+      - name: Build x64 AppX
+        run: npm run appx
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4
@@ -56,7 +42,8 @@ jobs:
         with:
           name: twinkle-tray-appx-x64-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*-store.appx
-      - run: npm run appx-arm64
+      - name: Build ARM64 AppX
+        run: npm run appx-arm64
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v4

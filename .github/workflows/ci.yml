@@ -4,56 +4,68 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Build All
+    name: Build all
     runs-on: windows-2022
 
     steps:
       - uses: actions/checkout@v4
+        name: Read repository
+      
       - name: Set up Node.js 18
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: 'npm'
+          
       - name: Get package.json info
         id: info
         uses: jaywcjlove/github-action-package@main
+        
       - name: Cache dependencies
         id: cache
         uses: actions/cache@v3
         with:
           path: ./node_modules
           key: modules-${{ hashFiles('package-lock.json') }}
+          
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Build assets
         run: npm run parcel-build
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Build Win32 installer
         run: npm exec electron-builder -- --x64 --config.extraMetadata.version="${{ steps.info.outputs.version }}+${{ github.sha }}" --config.win.artifactName="Twinkle Tray v${{ steps.info.outputs.version }}.exe"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - uses: actions/upload-artifact@v4
         name: Upload Win32 installer
         with:
           name: twinkle-tray-exe-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*.exe
+          
       - name: Build x64 AppX
         run: npm run appx
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - uses: actions/upload-artifact@v4
         name: Upload x64 AppX
         with:
           name: twinkle-tray-appx-x64-${{ github.ref_name }}-${{ github.sha }}
           path: dist/*-store.appx
+          
       - name: Build ARM64 AppX
         run: npm run appx-arm64
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            
       - uses: actions/upload-artifact@v4
         name: Upload ARM64 AppX
         with:
